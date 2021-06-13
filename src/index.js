@@ -214,7 +214,9 @@ const handleServiceRequest = (req) => {
                 email = outputContext.parameters.email;
                 transcript = outputContext.parameters.transcript;
                 date = outputContext.parameters.date;
-                time = outputContext.parameters.time.startTime;
+                if (outputContext.parameters.hasOwnProperty('time')) {
+                    time = outputContext.parameters.time.startTime;
+                }
             }
         }
     });
