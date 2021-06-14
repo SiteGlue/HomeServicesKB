@@ -20,7 +20,7 @@ webApp.get('/', (req, res) => {
 });
 
 // create utterance transcript
-const utteranceTranscript = (req, flag, oc='') => {
+const utteranceTranscript = (req, flag, oc = '') => {
 
     let fulfillmentText = '';
     let queryText = '';
@@ -193,6 +193,17 @@ const handleCallbackRequest = (req) => {
     }
 };
 
+// Convert number to day
+let numberToDay = [
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday'
+];
+
 const handleServiceRequest = (req) => {
 
     let outputContexts = req.body.queryResult.outputContexts;
@@ -288,6 +299,19 @@ const handleServiceRequest = (req) => {
             session: session,
             transcript: transcript
         }, true, oc);
+    } else if (phone === undefined) {
+        outString += `What is the best phone number to reach you? Please enter your 10 digit phone number.`;
+        let awaitPhone = `${session}/contexts/await-phone-sr`;
+        let oc = [{
+            name: awaitPhone,
+            lifespanCount: 1
+        }];
+        return utteranceTranscript({
+            fulfillmentText: outString,
+            queryText: queryText,
+            session: session,
+            transcript: transcript
+        }, true, oc);
     } else if (date === undefined) {
         outString += `What day of the week works best for you?`;
         let awaitDay = `${session}/contexts/await-day-sr`;
@@ -302,7 +326,9 @@ const handleServiceRequest = (req) => {
             transcript: transcript
         }, true, oc);
     } else if (time === undefined) {
-        outString += `Great. What time works best for you on $day? <button type="button" class"quick_reply">Morning</button> <button type="button" class"quick_reply">Mid-day</button> <button type="button" class"quick_reply">Afternoon</button> <button type="button" class"quick_reply">Evening</button>`;
+        let thisDate = new Date(date);
+        let day = numberToDay[thisDate.getDay()];
+        outString += `Great. What time works best for you on ${day}? <button type="button" class"quick_reply">Morning</button> <button type="button" class"quick_reply">Mid-day</button> <button type="button" class"quick_reply">Afternoon</button> <button type="button" class"quick_reply">Evening</button>`;
         let awaitTime = `${session}/contexts/await-time-sr`;
         let oc = [{
             name: awaitTime,
